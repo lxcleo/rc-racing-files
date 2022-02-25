@@ -1,0 +1,15 @@
+<launch>
+
+     
+    <!-- RaspiCam -->
+    <node pkg="raspicam_node" type="raspicam_node" name="raspicam_node" output="screen" launch-prefix= "nice -n -20 taskset -c 1">
+    <param name="width" value="640"/>
+    <param name="height" value="480"/>
+    <param name="framerate" value="40"/>
+    <param name="exposure_mode" value="antishake"/>
+    
+    </node>
+    <!-- Wheel Encoder -->
+    <node pkg="wheel_encoder" type= "wheel_encoder.py" name="wheel_encoder" launch-prefix= "taskset -c 1" output="screen">
+    </node>
+</launch>

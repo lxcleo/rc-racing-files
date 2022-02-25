@@ -1,0 +1,80 @@
+<launch>
+    <!-- Wheel Encoders & IR Lap Counter @ 100Hz -->
+    <node pkg="rosserial_wheel_encoder" type="serial_node" name="serial_node" launch-prefix= "nice -n 0 taskset -c 0" />
+    
+    <!-- RC Signal Receiver @ 90Hz -->
+    <node pkg="rc_receiver" type= "rc_receiver.py" name="rc_receiver" />
+    <!-- NeoPixel Demo @ 90Hz -->
+    <node pkg="neopixel_demo" type= "neopixel_demo.py" name="neopixel_demo" launch-prefix= "sudo"/>
+    <!-- Phidget IMU @ 90Hz -->
+    <node pkg="nodelet" type="nodelet" name="imu_manager"
+    args="manager" output="screen" launch-prefix= "nice -n 0 taskset -c 3"/>
+    <node pkg="nodelet" type="nodelet" name="PhidgetsSpatialNodelet"
+    args="load phidgets_spatial/PhidgetsSpatialNodelet imu_manager"
+    output="screen">
+    <param name="serial" value="373486"/>
+    # optional param frame_id, default is "imu_link"
+    <!-- <param name="frame_id" value="imu_link"/> -->
+    # optional param linear_acceleration_stdev, default is 280ug
+    <!-- <param name="linear_acceleration_stdev" value="0.002745862"/> -->
+    # optional param angular_velocity_stdev, default is 0.095 deg/s
+    <!-- <param name="angular_velocity_stdev" value="0.000349" /> -->
+    # optional param magnetic_field_stdev, default is 1.1 milligauss
+    <!-- <param name="magnetic_field_stdev" type="double" value="1.1e-7" /> -->
+    # supported data rates: 4 8 16 24 32 40 ... 1000 (in ms)
+    <param name="data_interval_ms" value="8"/>
+    # optional param publish_rate, defaults to 0
+    <param name="publish_rate" value="90" />
+    # compass correction params (see http://www.phidgets.com/docs/1044_User_Guide)
+    <!-- <param name="cc_mag_field" value="0.52859"/>
+         <param name="cc_offset0" value="0.03921"/>
+         <param name="cc_offset1" value="0.19441"/>
+         <param name="cc_offset2" value="-0.03493"/>
+         <param name="cc_gain0" value="1.81704"/>
+         <param name="cc_gain1" value="1.81028"/>
+         <param name="cc_gain2" value="2.04819"/>
+         <param name="cc_t0" value="0.00142"/>
+         <param name="cc_t1" value="-0.03591"/>
+         <param name="cc_t2" value="0.00160 "/>
+         <param name="cc_t3" value="-0.05038"/>
+         <param name="cc_t4" value="-0.03942"/>
+         <param name="cc_t5" value="-0.05673"/> -->
+    </node>
+    <node pkg="nodelet" type="nodelet" name="ImuFilterNodelet"
+    args="load imu_filter_madgwick/ImuFilterNodelet imu_manager"
+    output="screen" launch-prefix= "nice -n 0 taskset -c 3">
+    <param name="use_mag" value="true"/>
+    <param name="use_magnetic_field_msg" value="true"/>
+    </node>
+
+    <!-- RaspiCam @ 90Hz -->
+    <node pkg="raspicam_node" type="raspicam_node" name="raspicam_node" launch-prefix= "nice -n 0 taskset -c 2">
+    <param name="width" value="1280"/>
+    <param name="height" value="240"/>
+    <param name="framerate" value="90"/>
+    <param name="hFlip" value="True"/>
+    <param name="vFlip" value="True"/>
+    <param name="eposure_mode" value="fixedfps"/>
+    </node>
+
+    <!-- Odometry -->
+    <!--node pkg="bicycle_model_odom" type= "bicycle_model_odom.py" name="odometry" launch-prefix= "" output="screen"-->
+    <!--/node-->    
+    <!-- LD06 LIDAR -->
+    <!--node name="LD06" pkg="ldlidar" type="ldlidar" args="LD06" output="screen" -->
+    <!--param name="serial_port" value="/dev/ttyUSB0"/-->
+    <!--param name="lidar_frame" value="lidar"/-->
+    <!--/node-->
+    
+    <!-- image display -->
+    <!-- node name = "image_view" pkg="image_view" type="image_view" respawn="false" output="screen" -->
+    <!-- remap from= "/image" to="/raspicam_node/image"/ -->
+    <!-- param name = "image_transport" value="compressed"/ -->
+    <!-- param name = "autosize" value="false"/ -->
+    <!-- /node -->  
+      
+    <!-- BNO080 IMU -->
+    <!--node pkg="bno_imu" type= "imu.py" name="bno_imu" launch-prefix= ""-->
+    <!--/node-->
+    
+</launch>

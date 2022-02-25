@@ -1,0 +1,8 @@
+<launch>
+
+    <!-- Trajectory -->
+    <arg name="node_start_delay" default="2.0" />  
+    <node pkg="hotwheels_mpc" type= "publish_jesse_ref_path.py" name="trajectory" launch-prefix= "nice -n 0 taskset -c 3 bash -c 'sleep $(arg node_start_delay); $0 $@' " output="screen">
+    </node>
+    
+</launch>

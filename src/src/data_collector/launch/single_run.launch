@@ -1,0 +1,38 @@
+<launch>
+
+    <!-- Wheel Encoder -->
+    <node pkg="wheel_encoder" type= "wheel_encoder.py" name="wheel_encoder" launch-prefix= "nice -n 0 taskset -c 1">
+    </node>
+    
+    <!-- BNO080 IMU -->
+    <node pkg="bno_imu" type= "imu.py" name="bno_imu" launch-prefix= "nice -n 0 taskset -c 1" output="screen" >
+    </node>
+    
+    <!-- MPC -->
+    <node pkg="hotwheels_mpc" type="mpc_node" name="mpc_node" launch-prefix= "nice -n 0 taskset -c 0" output="screen" >
+    </node>
+    
+    <!-- Particle Filter -->
+    <node pkg="particle_filter" type="particle_filter.py" name="particle_filter" launch-prefix= "nice -n 0 taskset -c 2" >
+    </node>    
+    
+    <!-- Action -->
+    <node pkg="action" type="action.py" name="action" launch-prefix= "nice -n 0 taskset -c 3"  output="screen" >
+    </node>   
+        
+    <!-- RaspiCam -->
+    <node pkg="raspicam_node" type="raspicam_node" name="raspicam_node" output="screen" launch-prefix= "nice -n 0 taskset -c 1">
+    <param name="width" value="640"/>
+    <param name="height" value="480"/>
+    <param name="framerate" value="40"/>
+    <!--param name="hFlip" value="True"/-->
+    <!--param name="vFlip" value="True"/-->
+    <param name="exposure_mode" value="antishake"/>
+    </node>
+
+    <!-- Trajectory -->
+    <arg name="node_start_delay" default="5.0" />  
+    <node pkg="hotwheels_mpc" type= "publish_jesse_ref_path.py" name="trajectory" launch-prefix= "nice -n 0 taskset -c 3 bash -c 'sleep $(arg node_start_delay); $0 $@' " output="screen">
+    </node>
+    
+</launch>
